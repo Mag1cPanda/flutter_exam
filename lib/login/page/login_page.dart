@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flustars/flustars.dart' as FlutterStars;
 import 'package:flutterexam/common/common.dart';
 import 'package:flutterexam/res/resources.dart';
@@ -14,21 +15,22 @@ import 'package:flutterexam/widgets/my_scroll_view.dart';
 import 'package:flutterexam/widgets/my_text_field.dart';
 import 'package:flutterexam/routers/application.dart';
 
-import '../login_router.dart';
+import 'package:flutterexam/routers/routes.dart';
 
 
 class LoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
+
   //定义一个controller
   TextEditingController _cardNumberCTR = TextEditingController();
   TextEditingController _authCodeCTR = TextEditingController();
   final FocusNode _nodeText1 = FocusNode();
   final FocusNode _nodeText2 = FocusNode();
-//  bool _clickable = false;
+  bool _clickable = false;
 
   @override
   void initState() {
@@ -44,26 +46,29 @@ class _LoginPageState extends State<LoginPage> {
     String authCode = _authCodeCTR.text;
     bool clickable = true;
     //后面改为正则表达式
-//    if (cardNumber.isEmpty || cardNumber.length < 15) {
-//      clickable = false;
-//    }
-//    if (authCode.isEmpty || authCode.length < 4) {
-//      clickable = false;
-//    }
+    if (cardNumber.isEmpty || cardNumber.length < 15) {
+      clickable = false;
+    }
+    if (authCode.isEmpty || authCode.length < 4) {
+      clickable = false;
+    }
 
     /// 状态不一样在刷新，避免重复不必要的setState
-//    if (clickable != _clickable) {
-//      setState(() {
-//        _clickable = clickable;
-//      });
-//    }
+    if (clickable != _clickable) {
+      setState(() {
+        _clickable = clickable;
+      });
+    }
   }
 
   void _login() {
-//    FlutterStars.SpUtil.putString(Constant.cardNumber, _cardNumberCTR.text);
-    Navigator.pushNamed(context, 'choose_subject');
-    Application.router.navigateTo(
-        context, "choose_subject");
+    FlutterStars.SpUtil.putString(Constant.cardNumber, _cardNumberCTR.text);
+
+    if (FocusScope.of(context).isFirstFocus) {
+      FocusScope.of(context).unfocus();
+    }
+
+    Application.router.navigateTo(context, "choose_subject");
   }
 
   @override
@@ -71,18 +76,18 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: MyAppBar(
         centerTitle: '在线考试',
-//        isBack: false,
-        actionName: '验证码登录',
-        onPressed: () {
-//          print('111111');
-          Navigator.pushNamed(context, 'choose_subject');
-        },
+        isBack: false,
+//        actionName: '验证码登录',
+//        onPressed: () {
+//          Navigator.pushNamed(context, 'choose_subject');
+//        },
       ),
       body:MyScrollView(
         keyboardConfig: Utils.getKeyboardActionsConfig(context, [_nodeText1, _nodeText2]),
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0),
         children: _buildBody,
       ),
+
     );
   }
 
@@ -95,23 +100,23 @@ class _LoginPageState extends State<LoginPage> {
       maxLength: 18,
       keyboardType: TextInputType.text,
       hintText: '请输入身份证号号',
+      prefixIconPath: 'assets/images/login_cardno.png',
     ),
     Gaps.vGap8,
     MyTextField(
       key: const Key('authCode'),
       keyName: 'authCode',
       focusNode: _nodeText2,
-      isInputPwd: true,
       controller: _authCodeCTR,
-      keyboardType: TextInputType.visiblePassword,
-      maxLength: 16,
+      keyboardType: TextInputType.text,
+      maxLength: 4,
       hintText: '请输入验证码',
+      prefixIconPath: 'assets/images/auth_code.png',
     ),
     Gaps.vGap24,
     MyButton(
       key: const Key('login'),
-      onPressed: _login,
-//      onPressed: _clickable ? _login : null,
+      onPressed: _clickable ? _login : null,
       text: '确认',
     ),
   ];

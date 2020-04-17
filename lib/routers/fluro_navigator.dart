@@ -2,7 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
 import 'application.dart';
-import 'routers.dart';
+//import 'routers.dart';
 
 /// fluro的路由跳转工具类
 class NavigatorUtils {
@@ -42,6 +42,6 @@ class NavigatorUtils {
   /// 跳到WebView页
   static goWebViewPage(BuildContext context, String title, String url) {
     //fluro 不支持传中文,需转换
-    push(context, '${Routes.webViewPage}?title=${Uri.encodeComponent(title)}&url=${Uri.encodeComponent(url)}');
+//    push(context, '${Routes.webViewPage}?title=${Uri.encodeComponent(title)}&url=${Uri.encodeComponent(url)}');
   }
 }

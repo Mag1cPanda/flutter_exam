@@ -21,7 +21,11 @@ class MyTextField extends StatefulWidget {
     this.focusNode,
     this.isInputPwd: false,
     this.getVCode,
-    this.keyName
+    this.keyName,
+//    this.randomCode,
+
+    this.prefixIconPath: '',
+    this.imageURL: '',
   }): super(key: key);
 
   final TextEditingController controller;
@@ -32,6 +36,9 @@ class MyTextField extends StatefulWidget {
   final FocusNode focusNode;
   final bool isInputPwd;
   final Future<bool> Function() getVCode;
+  final String imageURL;
+  final String prefixIconPath;
+//  final String randomCode;
   /// 用于集成测试寻找widget
   final String keyName;
 
@@ -106,92 +113,50 @@ class _MyTextFieldState extends State<MyTextField> {
           controller: widget.controller,
           textInputAction: TextInputAction.done,
           keyboardType: widget.keyboardType,
-          // 数字、手机号限制格式为0到9(白名单)， 密码限制不包含汉字（黑名单）
-          inputFormatters: (widget.keyboardType == TextInputType.number || widget.keyboardType == TextInputType.phone) ?
-          [WhitelistingTextInputFormatter(RegExp('[0-9]'))] : [BlacklistingTextInputFormatter(RegExp('[\u4e00-\u9fa5]'))],
+
           decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+              contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
               hintText: widget.hintText,
               counterText: '',
-              focusedBorder: UnderlineInputBorder(
+              prefixIcon: Container(
+                padding: EdgeInsets.all(8.0),
+                width: 40,
+                height: 40,
+                child: Image.asset(
+                  widget.prefixIconPath,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Colors.red,
+                      color: Colours.app_main,
                       width: 0.8
                   )
               ),
-              enabledBorder: UnderlineInputBorder(
+              enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Colors.red,
+                      color: Colours.unselected_item_color,
                       width: 0.8
                   )
               )
           ),
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _isShowDelete ? Gaps.empty : Semantics(
-              label: '清空',
-              hint: '清空输入框',
-              child: GestureDetector(
-                child: LoadAssetImage('login/qyg_shop_icon_delete',
-                  key: Key('${widget.keyName}_delete'),
-                  width: 18.0,
-                  height: 40.0,
-                ),
-                onTap: () => widget.controller.text = '',
-              ),
+
+        Container(
+          margin:const EdgeInsets.symmetric(vertical: 0),
+          color: Colors.red,
+          child: FlatButton(
+            onPressed: _clickable ? _getVCode : null,
+            textColor: Colors.white,
+            color: Colours.app_main,
+            disabledTextColor: isDark ? Colours.dark_text : Colors.white,
+            disabledColor: isDark ? Colours.dark_text_gray : Colours.text_gray_c,
+            child: Text(
+              _clickable ? 'ABCD' : '（$_currentSecond s）',
+              style: TextStyle(fontSize: Dimens.font_sp16),
             ),
-            !widget.isInputPwd ? Gaps.empty : Gaps.hGap15,
-            !widget.isInputPwd ? Gaps.empty : Semantics(
-              label: '密码可见开关',
-              hint: '密码是否可见',
-              child: GestureDetector(
-                child: LoadAssetImage(
-                  _isShowPwd ? 'login/qyg_shop_icon_display' : 'login/qyg_shop_icon_hide',
-                  key: Key('${widget.keyName}_showPwd'),
-                  width: 18.0,
-                  height: 40.0,
-                ),
-                onTap: () {
-                  setState(() {
-                    _isShowPwd = !_isShowPwd;
-                  });
-                },
-              ),
-            ),
-            widget.getVCode == null ? Gaps.empty : Gaps.hGap15,
-            widget.getVCode == null ? Gaps.empty :
-            Theme(
-              data: Theme.of(context).copyWith(
-                buttonTheme: ButtonThemeData(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  height: 26.0,
-                  minWidth: 76.0,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-              child: FlatButton(
-                onPressed: _clickable ? _getVCode : null,
-                textColor: Colors.red,
-                color: Colors.transparent,
-                disabledTextColor: isDark ? Colours.dark_text : Colors.white,
-                disabledColor: isDark ? Colours.dark_text_gray : Colours.text_gray_c,
-                shape:RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(1.0),
-                    side: BorderSide(
-                      color: _clickable ? Colors.red : Colors.transparent,
-                      width: 0.8,
-                    )
-                ),
-                child: Text(
-                  _clickable ? '获取验证码' : '（$_currentSecond s）',
-                  style: TextStyle(fontSize: Dimens.font_sp12),
-                ),
-              ),
-            )
-          ],
-        )
+          ),
+        ),
+
       ],
     );
   }

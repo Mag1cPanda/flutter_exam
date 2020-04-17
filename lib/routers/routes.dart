@@ -4,16 +4,14 @@ import './route_handlers.dart';
 
 class Routes {
   static String root = "/";
-  static String login = "/login";
+//  static String login = "/login";
   static String chooseSubject = "/choose_subject";
 
   static void configureRoutes(Router router) {
-    router.notFoundHandler = Handler(
-        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-          print("ROUTE WAS NOT FOUND !!!");
-        });
-    router.define(login, handler: loginHandler);
+
+    router.define(root, handler: loginHandler);
+//    router.define(login, handler: loginHandler);
     router.define(chooseSubject,
-        handler: chooseSubjectHandler, transitionType: TransitionType.inFromLeft);
+        handler: chooseSubjectHandler, transitionType: TransitionType.native);
   }
 }
