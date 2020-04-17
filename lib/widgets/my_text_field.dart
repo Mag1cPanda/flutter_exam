@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutterexam/res/resources.dart';
 
 import 'load_image.dart';
+
 
 /// 登录模块的输入框封装
 class MyTextField extends StatefulWidget {
@@ -50,6 +52,8 @@ class _MyTextFieldState extends State<MyTextField> {
   bool _isShowPwd = false;
   bool _isShowDelete = false;
   bool _clickable = true;
+
+  String _randomCode = 'ABCD';
   /// 倒计时秒数
   final int _second = 30;
   /// 当前秒数
@@ -63,6 +67,8 @@ class _MyTextFieldState extends State<MyTextField> {
     _isShowDelete = widget.controller.text.isEmpty;
     /// 监听输入改变
     widget.controller.addListener(isEmpty);
+
+    print('result');
   }
 
   void isEmpty() {
@@ -84,17 +90,19 @@ class _MyTextFieldState extends State<MyTextField> {
 
   Future _getVCode() async {
     bool isSuccess = await widget.getVCode();
+    print('result');
+    print('alphabet');
     if (isSuccess != null && isSuccess) {
-      setState(() {
-        _currentSecond = _second;
-        _clickable = false;
-      });
-      _subscription = Stream.periodic(Duration(seconds: 1), (i) => i).take(_second).listen((i) {
-        setState(() {
-          _currentSecond = _second - i - 1;
-          _clickable = _currentSecond < 1;
-        });
-      });
+//      var codeArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+//        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      String alphabet = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+      String result = '';
+      print(alphabet);
+      for (int i = 0; i < 4; i++) {
+        result = result + alphabet[Random().nextInt(alphabet.length)];
+      }
+      print(result);
+      _randomCode = result;
     }
   }
 
@@ -142,8 +150,9 @@ class _MyTextFieldState extends State<MyTextField> {
         ),
 
         Container(
-          margin:const EdgeInsets.symmetric(vertical: 0),
-          color: Colors.red,
+          height: _randomCode.length > 0 ? 40 : 0,
+          margin:const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+//          color: Colors.red,
           child: FlatButton(
             onPressed: _clickable ? _getVCode : null,
             textColor: Colors.white,
@@ -151,7 +160,7 @@ class _MyTextFieldState extends State<MyTextField> {
             disabledTextColor: isDark ? Colours.dark_text : Colors.white,
             disabledColor: isDark ? Colours.dark_text_gray : Colours.text_gray_c,
             child: Text(
-              _clickable ? 'ABCD' : '（$_currentSecond s）',
+              _randomCode,
               style: TextStyle(fontSize: Dimens.font_sp16),
             ),
           ),

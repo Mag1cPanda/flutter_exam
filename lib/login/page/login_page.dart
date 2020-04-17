@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flustars/flustars.dart' as FlutterStars;
 import 'package:flutterexam/common/common.dart';
+import 'package:flutterexam/config/config.dart';
 import 'package:flutterexam/res/resources.dart';
 import 'package:flutterexam/routers/fluro_navigator.dart';
 import 'package:flutterexam/util/log_utils.dart';
@@ -16,6 +17,9 @@ import 'package:flutterexam/widgets/my_text_field.dart';
 import 'package:flutterexam/routers/application.dart';
 
 import 'package:flutterexam/routers/routes.dart';
+import 'dart:math';
+
+import 'package:flutterexam/net/dio_utils.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -24,8 +28,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-
-  //定义一个controller
   TextEditingController _cardNumberCTR = TextEditingController();
   TextEditingController _authCodeCTR = TextEditingController();
   final FocusNode _nodeText1 = FocusNode();
@@ -49,9 +51,9 @@ class LoginPageState extends State<LoginPage> {
     if (cardNumber.isEmpty || cardNumber.length < 15) {
       clickable = false;
     }
-    if (authCode.isEmpty || authCode.length < 4) {
-      clickable = false;
-    }
+//    if (authCode.isEmpty || authCode.length < 4) {
+//      clickable = false;
+//    }
 
     /// 状态不一样在刷新，避免重复不必要的setState
     if (clickable != _clickable) {
@@ -68,7 +70,8 @@ class LoginPageState extends State<LoginPage> {
       FocusScope.of(context).unfocus();
     }
 
-    Application.router.navigateTo(context, "choose_subject");
+    DioUtils.instance.loadData(getExamSubject, {'cardno':_cardNumberCTR.text});
+//    Application.router.navigateTo(context, "choose_subject");
   }
 
   @override
@@ -77,10 +80,17 @@ class LoginPageState extends State<LoginPage> {
       appBar: MyAppBar(
         centerTitle: '在线考试',
         isBack: false,
-//        actionName: '验证码登录',
-//        onPressed: () {
-//          Navigator.pushNamed(context, 'choose_subject');
-//        },
+        actionName: '验证码登录',
+        onPressed: () {
+          String alphabet = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+          String result = '';
+          print(alphabet);
+          for (int i = 0; i < 4; i++) {
+            result = result + alphabet[Random().nextInt(alphabet.length)];
+          }
+          result = result.toUpperCase();
+          print(result);
+        },
       ),
       body:MyScrollView(
         keyboardConfig: Utils.getKeyboardActionsConfig(context, [_nodeText1, _nodeText2]),

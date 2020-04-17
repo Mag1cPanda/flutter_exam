@@ -16,6 +16,9 @@ class Constant {
   static const String refreshToken = 'refreshToken';
   static const String cardNumber = 'cardNumber';
 
+  static const String randomCode = 'randomCode';
+
+
   static const String theme = 'AppTheme';
 
 }
