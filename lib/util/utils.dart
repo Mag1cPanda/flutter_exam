@@ -7,8 +7,18 @@ import 'package:flutterexam/util/toast.dart';
 import 'package:keyboard_actions/keyboard_action.dart';
 import 'package:keyboard_actions/keyboard_actions_config.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:math';
 
 class Utils {
+  static String getRandomCode(digit) {
+    String alphabet = 'QWERTYUIOPASDFGHJKLZXCVBNM';
+    String result = '';
+    print(alphabet);
+    for (int i = 0; i < digit; i++) {
+      result = result + alphabet[Random().nextInt(alphabet.length)];
+    }
+    return result;
+  }
 
   /// 调起拨号页
   static void launchTelURL(String phone) async {

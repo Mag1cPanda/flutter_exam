@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterexam/res/resources.dart';
+import 'package:flutterexam/util/utils.dart';
+import 'package:flustars/flustars.dart' as FlutterStars;
+import 'package:flutterexam/common/common.dart';
 
 import 'load_image.dart';
 
@@ -24,7 +27,7 @@ class MyTextField extends StatefulWidget {
     this.isInputPwd: false,
     this.getVCode,
     this.keyName,
-//    this.randomCode,
+    this.randomCode,
 
     this.prefixIconPath: '',
     this.imageURL: '',
@@ -40,7 +43,7 @@ class MyTextField extends StatefulWidget {
   final Future<bool> Function() getVCode;
   final String imageURL;
   final String prefixIconPath;
-//  final String randomCode;
+  final String randomCode;
   /// 用于集成测试寻找widget
   final String keyName;
 
@@ -52,8 +55,8 @@ class _MyTextFieldState extends State<MyTextField> {
   bool _isShowPwd = false;
   bool _isShowDelete = false;
   bool _clickable = true;
+  String _randomCode = '';
 
-  String _randomCode = 'ABCD';
   /// 倒计时秒数
   final int _second = 30;
   /// 当前秒数
@@ -68,7 +71,8 @@ class _MyTextFieldState extends State<MyTextField> {
     /// 监听输入改变
     widget.controller.addListener(isEmpty);
 
-    print('result');
+    _randomCode = widget.randomCode;
+
   }
 
   void isEmpty() {
@@ -88,22 +92,15 @@ class _MyTextFieldState extends State<MyTextField> {
     widget.controller?.removeListener(isEmpty);
   }
 
-  Future _getVCode() async {
-    bool isSuccess = await widget.getVCode();
-    print('result');
-    print('alphabet');
-    if (isSuccess != null && isSuccess) {
-//      var codeArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-//        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-      String alphabet = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
-      String result = '';
-      print(alphabet);
-      for (int i = 0; i < 4; i++) {
-        result = result + alphabet[Random().nextInt(alphabet.length)];
-      }
-      print(result);
+  _getVCode () {
+    var result = Utils.getRandomCode(4);
+
+    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
+    print('putString:' + result);
+    //告诉Flutter框架State改变
+    setState(() {
       _randomCode = result;
-    }
+    });
   }
 
   @override
@@ -150,17 +147,17 @@ class _MyTextFieldState extends State<MyTextField> {
         ),
 
         Container(
-          height: _randomCode.length > 0 ? 40 : 0,
+          height: widget.randomCode != null ? 40 : 0,
           margin:const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
 //          color: Colors.red,
           child: FlatButton(
-            onPressed: _clickable ? _getVCode : null,
+            onPressed: _getVCode,
             textColor: Colors.white,
             color: Colours.app_main,
             disabledTextColor: isDark ? Colours.dark_text : Colors.white,
             disabledColor: isDark ? Colours.dark_text_gray : Colours.text_gray_c,
             child: Text(
-              _randomCode,
+              '$_randomCode',
               style: TextStyle(fontSize: Dimens.font_sp16),
             ),
           ),

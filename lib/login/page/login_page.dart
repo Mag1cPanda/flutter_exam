@@ -15,9 +15,11 @@ import 'package:flutterexam/widgets/my_button.dart';
 import 'package:flutterexam/widgets/my_scroll_view.dart';
 import 'package:flutterexam/widgets/my_text_field.dart';
 import 'package:flutterexam/routers/application.dart';
+import 'package:flutterexam/widgets/my_loading.dart';
 
 import 'package:flutterexam/routers/routes.dart';
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutterexam/net/dio_utils.dart';
 
@@ -33,6 +35,7 @@ class LoginPageState extends State<LoginPage> {
   final FocusNode _nodeText1 = FocusNode();
   final FocusNode _nodeText2 = FocusNode();
   bool _clickable = false;
+  String _randomCode = '';
 
   @override
   void initState() {
@@ -40,7 +43,24 @@ class LoginPageState extends State<LoginPage> {
     //监听输入改变
     _cardNumberCTR.addListener(_verify);
     _authCodeCTR.addListener(_verify);
+    FlutterStars.SpUtil.getInstance();
     _cardNumberCTR.text = FlutterStars.SpUtil.getString(Constant.cardNumber);
+
+    //获取随机字符串
+    _randomCode = Utils.getRandomCode(4);
+    _putRandomCode();
+  }
+
+  void _getRandomCode() async {
+    await FlutterStars.SpUtil.getInstance();
+    _randomCode = FlutterStars.SpUtil.getString(Constant.randomCode);
+    print('getString:' + _randomCode);
+  }
+
+  void _putRandomCode() async {
+    await FlutterStars.SpUtil.getInstance();
+    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
+    print('putString:' + _randomCode);
   }
 
   void _verify() {
@@ -51,9 +71,11 @@ class LoginPageState extends State<LoginPage> {
     if (cardNumber.isEmpty || cardNumber.length < 15) {
       clickable = false;
     }
-//    if (authCode.isEmpty || authCode.length < 4) {
-//      clickable = false;
-//    }
+
+    _getRandomCode();
+    if (authCode.isEmpty || authCode.toUpperCase() != _randomCode) {
+      clickable = false;
+    }
 
     /// 状态不一样在刷新，避免重复不必要的setState
     if (clickable != _clickable) {
@@ -64,13 +86,28 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void _login() {
-    FlutterStars.SpUtil.putString(Constant.cardNumber, _cardNumberCTR.text);
+
 
     if (FocusScope.of(context).isFirstFocus) {
       FocusScope.of(context).unfocus();
     }
 
-    DioUtils.instance.loadData(getExamSubject, {'cardno':_cardNumberCTR.text});
+    var params = {'cardno':_cardNumberCTR.text};
+
+    DioUtils.loadData(
+      getExamSubject,
+      params: params,
+      onSuccess: (data) {
+        print('onSuccess');
+        Map<String, dynamic> examData = jsonDecode(data);
+        String tmp = examData['result']['javaClass'];
+        print(tmp);
+      },
+      onError: (error) {
+        print('onError');
+      },
+    );
+
 //    Application.router.navigateTo(context, "choose_subject");
   }
 
@@ -122,6 +159,7 @@ class LoginPageState extends State<LoginPage> {
       maxLength: 4,
       hintText: '请输入验证码',
       prefixIconPath: 'assets/images/auth_code.png',
+      randomCode: _randomCode,
     ),
     Gaps.vGap24,
     MyButton(

@@ -16,12 +16,10 @@ import 'package:flutterexam/home/choose_subject_page.dart';
 
 import 'package:flutterexam/routers/app_component.dart';
 import 'package:flustars/flustars.dart' as FlutterStars;
+import 'dart:math';
 
 void main() {
   runApp(MyApp());
-
-  print('main');
-  debugPrint('main');
 
   // 透明状态栏
   if (Device.isAndroid) {
@@ -34,12 +32,19 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return OKToast(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: AppComponent(),
       ),
-      home: AppComponent(),
+
+        backgroundColor: Colors.black54,
+        textPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+        radius: 20.0,
+        position: ToastPosition.bottom,
     );
   }
 }
