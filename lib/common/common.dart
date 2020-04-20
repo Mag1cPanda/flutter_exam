@@ -14,9 +14,12 @@ class Constant {
   static const String phone = 'phone';
   static const String accessToken = 'accessToken';
   static const String refreshToken = 'refreshToken';
-  static const String cardNumber = 'cardNumber';
 
-  static const String randomCode = 'randomCode';
+//  static const String randomCode = 'randomCode';
+//  static const String cardNumber = 'cardNumber';
+//  static const String personName = 'personName';
+
+
 
 
   static const String theme = 'AppTheme';

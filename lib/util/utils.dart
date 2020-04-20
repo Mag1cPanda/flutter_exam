@@ -13,7 +13,6 @@ class Utils {
   static String getRandomCode(digit) {
     String alphabet = 'QWERTYUIOPASDFGHJKLZXCVBNM';
     String result = '';
-    print(alphabet);
     for (int i = 0; i < digit; i++) {
       result = result + alphabet[Random().nextInt(alphabet.length)];
     }

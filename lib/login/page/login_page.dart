@@ -22,6 +22,8 @@ import 'dart:math';
 import 'dart:convert';
 
 import 'package:flutterexam/net/dio_utils.dart';
+import 'package:flutterexam/common/global.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -37,31 +39,86 @@ class LoginPageState extends State<LoginPage> {
   bool _clickable = false;
   String _randomCode = '';
 
+  showLoadingDialog(BuildContext loadingContext) {
+    showDialog(
+      context: loadingContext,
+      barrierDismissible: true, //点击遮罩不关闭对话框
+      builder: (loadingContext) {
+        return UnconstrainedBox(
+          constrainedAxis: Axis.vertical,
+          child: SizedBox(
+            width: 180,
+            child: AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colours.app_main),
+                  ),
+//                  Padding(
+//                    padding: const EdgeInsets.only(top: 26.0),
+//                    child: Text("正在加载，请稍后..."),
+//                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _showSingleAnimationDialog(BuildContext context, Indicator indicator) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(indicator.toString().split('.').last),
+              backgroundColor: Colors.pink,
+            ),
+            backgroundColor: Colors.teal,
+            body: Padding(
+              padding: const EdgeInsets.all(64),
+              child: LoadingIndicator(
+                indicatorType: indicator,
+                color: Colors.white,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     //监听输入改变
     _cardNumberCTR.addListener(_verify);
     _authCodeCTR.addListener(_verify);
-    FlutterStars.SpUtil.getInstance();
-    _cardNumberCTR.text = FlutterStars.SpUtil.getString(Constant.cardNumber);
+//    _cardNumberCTR.text = Global.instance.cardNumber;
 
     //获取随机字符串
     _randomCode = Utils.getRandomCode(4);
-    _putRandomCode();
+    //存入Global
+    Global.instance.randomCode = _randomCode;
   }
 
-  void _getRandomCode() async {
-    await FlutterStars.SpUtil.getInstance();
-    _randomCode = FlutterStars.SpUtil.getString(Constant.randomCode);
-    print('getString:' + _randomCode);
-  }
+//  void _getRandomCode() async {
+//    await FlutterStars.SpUtil.getInstance();
+//    _randomCode = FlutterStars.SpUtil.getString(Constant.randomCode);
+//    print('getString:' + _randomCode);
+//  }
 
-  void _putRandomCode() async {
-    await FlutterStars.SpUtil.getInstance();
-    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
-    print('putString:' + _randomCode);
-  }
+//  void _putRandomCode() async {
+//    await FlutterStars.SpUtil.getInstance();
+//    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
+//    print('putString:' + _randomCode);
+//  }
 
   void _verify() {
     String cardNumber = _cardNumberCTR.text;
@@ -72,8 +129,9 @@ class LoginPageState extends State<LoginPage> {
       clickable = false;
     }
 
-    _getRandomCode();
-    if (authCode.isEmpty || authCode.toUpperCase() != _randomCode) {
+    _randomCode = Global.instance.randomCode;
+
+    if (authCode.isEmpty || authCode.length != 4) {
       clickable = false;
     }
 
@@ -86,29 +144,39 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void _login() {
+    FocusScope.of(context).unfocus();
 
-
-    if (FocusScope.of(context).isFirstFocus) {
-      FocusScope.of(context).unfocus();
+    if (_authCodeCTR.text.toUpperCase() != _randomCode) {
+      Toast.show('验证码输入错误');
+      return;
     }
 
+//    Loading.showLoading(context);
+    showLoadingDialog(context);
+//    _showSingleAnimationDialog(context, Indicator.lineScale);
     var params = {'cardno':_cardNumberCTR.text};
-
     DioUtils.loadData(
       getExamSubject,
       params: params,
       onSuccess: (data) {
         print('onSuccess');
         Map<String, dynamic> examData = jsonDecode(data);
-        String tmp = examData['result']['javaClass'];
-        print(tmp);
+        String cardno = examData['result']['personinfo']['cardno'];
+        String personname = examData['result']['personinfo']['personname'];
+        List exam = examData['result']['exam'];
+        Global.instance.cardNumber = cardno;
+        Global.instance.personName = personname;
+        Global.instance.exam = exam;
+
+
+        Navigator.of(context).pop("SimpleDialogOption One");
+//        Application.router.navigateTo(context, "choose_subject");
       },
       onError: (error) {
         print('onError');
+        Toast.show('登录失败');
       },
     );
-
-//    Application.router.navigateTo(context, "choose_subject");
   }
 
   @override
@@ -119,14 +187,9 @@ class LoginPageState extends State<LoginPage> {
         isBack: false,
         actionName: '验证码登录',
         onPressed: () {
-          String alphabet = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
-          String result = '';
-          print(alphabet);
-          for (int i = 0; i < 4; i++) {
-            result = result + alphabet[Random().nextInt(alphabet.length)];
-          }
-          result = result.toUpperCase();
-          print(result);
+//          showLoadingDialog();
+//          _showSingleAnimationDialog(context, Indicator.lineScale);
+
         },
       ),
       body:MyScrollView(

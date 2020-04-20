@@ -39,6 +39,9 @@ dependencies:
   cached_network_image: ^2.0.0
   sprintf: ^4.0.2
   provider: ^4.0.4
+  azlistview: ^0.1.2
+  lpinyin: ^1.0.7
+  loading_indicator: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +62,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/data/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -9,6 +9,7 @@ import 'package:flutterexam/res/resources.dart';
 import 'package:flutterexam/util/utils.dart';
 import 'package:flustars/flustars.dart' as FlutterStars;
 import 'package:flutterexam/common/common.dart';
+import 'package:flutterexam/common/global.dart';
 
 import 'load_image.dart';
 
@@ -95,13 +96,19 @@ class _MyTextFieldState extends State<MyTextField> {
   _getVCode () {
     var result = Utils.getRandomCode(4);
 
-    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
-    print('putString:' + result);
+    Global.instance.randomCode = result;
+
     //告诉Flutter框架State改变
     setState(() {
       _randomCode = result;
     });
   }
+
+//  void _putRandomCode() async {
+//    await FlutterStars.SpUtil.getInstance();
+//    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
+//    print('putString:' + _randomCode);
+//  }
 
   @override
   Widget build(BuildContext context) {
