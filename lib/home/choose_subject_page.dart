@@ -9,12 +9,18 @@ import 'package:flutterexam/widgets/app_bar.dart';
 import 'package:flutterexam/widgets/my_scroll_view.dart';
 import 'package:flutterexam/common/global.dart';
 import 'package:flutterexam/util/toast.dart';
-import 'package:azlistview/azlistview.dart';
 import 'dart:convert';
 import 'package:flutterexam/widgets/grouped_listview.dart';
 import 'contact_model.dart';
 import 'exam_model.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:flutterexam/widgets/my_button.dart';
+import 'package:flutterexam/routers/application.dart';
+import 'package:flutterexam/net/dio_utils.dart';
+import 'package:flutterexam/common/global.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutterexam/config/config.dart';
+import 'package:flutterexam/routers/routes.dart';
 
 class ChooseSubjectPage extends StatefulWidget {
   @override
@@ -22,14 +28,23 @@ class ChooseSubjectPage extends StatefulWidget {
 }
 
 class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
-  List<ContactInfo> _contacts = List();
+//  List _exams = [
+//    {'javaClass': 'com.longrise.LEAP.Base.Objects.EntityBean',
+//      'examtype': '100',
+//      'examtypename': '永兴元企业员工测评',
+//      'list':[{'examsubject': '999',
+//        'examtypename': 'sp测试科目',
+//        'examid': '49348573d1d340bb98dafa0702c5ecb9',
+//        'exampic': 'http://wuhan.yxybb.com/BXEXAMOL/LEAP/Download/default/2020/4/9//0f7ef1d5caac45229b374ce265bdb9c7.jpg',
+//        'selected': false}],
+//    },
+//  ];
   List _exams = Global.instance.exam;
-  int _suspensionHeight = 40;
-  int _itemHeight = 100;
-  String _suspensionTag = "";
+  bool _clickable = false;
 
-  String selectedIcon = 'assets/images/ic_back_black.png';
-  String unselectedIcon = 'assets/images/ic_back_black.png';
+//  String selectedIcon = 'assets/images/ic_back_black.png';
+//  String unselectedIcon = 'assets/images/ic_back_black.png';
+  Map _selectedExam = {};
 
   @override
   void initState() {
@@ -38,102 +53,16 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
   }
 
   void loadData() async {
-
-    rootBundle.loadString('assets/data/contacts.json').then((value) {
-      List list = json.decode(value);
-      list.forEach((value) {
-        _contacts.add(ContactInfo(name: value['name']));
-      });
-      _handleList(_contacts);
-
-
-
-//      for(int i=0; i<Global.instance.exam.length; i++) {
-//        List list = Global.instance.exam[i]['list'];
-//        for(int j=0; j<list.length; j++) {
-//          Global.instance.exam[i]['list'][j]['selected'] = false;
-//          Global.instance.exam[0]['list'][0]['exampic'] = '111111';
-//        }
-//      }
-
-      setState(() {});
-    });
-
-
-  }
-
-  void _handleList(List<ContactInfo> list) {
-    if (list == null || list.isEmpty) return;
-    for (int i = 0, length = list.length; i < length; i++) {
-      String pinyin = PinyinHelper.getPinyinE(list[i].name);
-      String tag = pinyin.substring(0, 1).toUpperCase();
-      list[i].namePinyin = pinyin;
-      if (RegExp("[A-Z]").hasMatch(tag)) {
-        list[i].tagIndex = tag;
-      } else {
-        list[i].tagIndex = "#";
+    for(int i=0; i<_exams.length; i++) {
+      List list = _exams[i]['list'];
+      for(int j=0; j<list.length; j++) {
+        _exams[i]['list'][j]['selected'] = false;
       }
     }
-    //根据A-Z排序
-    SuspensionUtil.sortListBySuspensionTag(_contacts);
-  }
 
-  Widget _buildSusWidget(String susTag) {
-    return Container (
-      padding: EdgeInsets.all(20.0),
-      width: 750,
-//      height: _suspensionHeight.toDouble(),
-      child: Row(children: <Widget>[
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: Color(0xFFF96065), width: 0.5),
-            borderRadius: BorderRadius.circular(3.0),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-            child: Text('考试类型',
-              style: TextStyle(
-                color: const Color(0xFFF96065),
-                fontSize: 10,
-              ),
-            ),
-          )
-        ),
+    setState(() {
 
-        Gaps.hGap10,
-        Text('永兴元企业员工测评',
-          style: TextStyle(
-            color: const Color(0xFF333333),
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-          ),
-        ),
-      ],),
-    );
-  }
-
-  Widget _buildListItem(ContactInfo model) {
-    String susTag = model.getSuspensionTag();
-    return Column(
-      children: <Widget>[
-        Offstage(
-          offstage: model.isShowSuspension != true,
-          child: _buildSusWidget(susTag),
-        ),
-        SizedBox(
-//          height: _itemHeight.toDouble(),
-          child: ListTile(
-            leading: Image.asset(
-                'assets/images/ic_back_black.png'
-            ),
-            title: Text(model.name),
-            onTap: () {
-              print("OnItemClick: $model");
-            },
-          ),
-        )
-      ],
-    );
+    });
   }
 
 
@@ -146,12 +75,12 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
         actionName: '验证码登录',
         onPressed: () {
 //          print(Global.instance.exam[0]['list'][0]['selected']);
-          print(_exams);
-//          print(Global.instance.exam);
+//          print(_exams);
+          print(Global.instance.exam);
         },
       ),
-      body:MyScrollView(
-//        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0),
+      body:Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: _buildBody,
       ),
     );
@@ -188,22 +117,131 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
       ),
     ),
 
-    AzListView(
-      data: _contacts,
-      itemBuilder: (context, model) => _buildListItem(model),
-      indexBarBuilder: (BuildContext context, List<String> tags,
-          IndexBarTouchCallback onTouch) {
-        return null;
-      },
-//      isUseRealIndex: true,
-      itemHeight: _itemHeight,
-      suspensionHeight: _suspensionHeight,
+    //List撑满剩余控件，使按钮固定到底部
+    Expanded(
+      child: ListView(
+        children: _buildList(),
+      ),
     ),
 
-//    MyButton(
-//      key: const Key('login'),
-//      onPressed: _clickable ? _login : null,
-//      text: '确认',
-//    ),
+    MyButton(
+      key: const Key('login'),
+      onPressed: _clickable ? _clickConfirm : null,
+      text: '确认',
+    ),
   ];
+
+  List<Widget> _buildList() {
+    List<Widget> widgets = [];
+
+    for(int i=0; i<_exams.length; i++) {
+      var exam = _exams[i];
+      var typeName = exam['examtypename'];
+      var subjects = exam['list'];
+      widgets.add(_item(typeName, subjects));
+    }
+
+    return widgets;
+  }
+
+
+  Widget _item(String typeName, List subjects) {
+    return Column(
+      children: <Widget>[
+        Gaps.vGap16,
+        Row(
+          children: <Widget>[
+            Gaps.hGap20,
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),///圆角
+                  border: Border.all(color: Color(0xFFF96065),width: 1)///边框颜色、宽
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+                child: Text(
+                  '考试类型',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFFF96065),
+                  ),
+                ),
+              ),
+            ),
+            Gaps.hGap10,
+            Text(typeName,
+              style: TextStyle(
+                color: Color(0xFF333333),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+
+        Column(
+            children: subjects.map((subject) => _buildSub(subject)).toList()),
+      ],
+    );
+  }
+
+  void _clickConfirm() {
+    print(_selectedExam);
+
+
+//    EasyLoading.show();
+//    var params = {'cardno':Global.instance.cardNumber};
+//    DioUtils.loadData(
+//      getExamProcess,
+//      params: params,
+//      onSuccess: (data) {
+//        print('onSuccess');
+////        Map examData = jsonDecode(data);
+//        EasyLoading.dismiss();
+//
+//        Application.router.navigateTo(context, Routes.selectPaper);
+//      },
+//      onError: (error) {
+//        print('onError');
+//        EasyLoading.dismiss();
+//        Toast.show('登录失败');
+//      },
+//    );
+
+
+  }
+
+  Widget _buildSub(Map subject) {
+    return GestureDetector(
+      onTap: (){
+        //反选 重置_selectedExam
+        if(_selectedExam != {}) {
+          setState(() {
+            _selectedExam = {};
+            _clickable = false;
+          });
+        }
+      },
+      child: RadioListTile(
+        activeColor: Colours.app_main,
+        value: subject,
+        title: Text(
+          subject['examtypename'],
+          style: TextStyle(
+            color: _selectedExam==subject ? Color(0xFFFFA200) : Color(0xFF333333),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        groupValue: _selectedExam,
+        onChanged: (value) {
+          print(value);
+          setState(() {
+            _selectedExam = subject;
+            _clickable = true;
+          });
+        },
+      ),
+    );
+  }
 }

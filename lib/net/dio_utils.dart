@@ -36,10 +36,9 @@ class DioUtils {
         Function(T t) onSuccess,
         Function(String error) onError,
       }) async {
-//    var url = bxContext + getExamSubject + suffix;
-//    Response response = await _dio.post(url,
-//        data: {'cardno': '42100419920521421X'});
-    var url = bxContext + methodName + suffix;
+//    var url = bxContext + methodName + suffix;
+    var url = bxContext + restAPI + methodName + suffix;
+    print(url);
     var result;
     try {
       Response response = await DioUtils.buildDio().post(url,

@@ -4,6 +4,12 @@ class Global {
   String personName = '';
   List exam = [];
 
+  //选择的考试
+  String examId = '';
+  String examSubject = '';
+  String examName = '';
+  String examPic = '';
+
   factory Global() => _getInstance();
   static Global get instance => _getInstance();
   static Global _instance;

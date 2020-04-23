@@ -15,15 +15,13 @@ import 'package:flutterexam/widgets/my_button.dart';
 import 'package:flutterexam/widgets/my_scroll_view.dart';
 import 'package:flutterexam/widgets/my_text_field.dart';
 import 'package:flutterexam/routers/application.dart';
-import 'package:flutterexam/widgets/my_loading.dart';
-
 import 'package:flutterexam/routers/routes.dart';
 import 'dart:math';
 import 'dart:convert';
 
 import 'package:flutterexam/net/dio_utils.dart';
 import 'package:flutterexam/common/global.dart';
-import 'package:loading_indicator/loading_indicator.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -37,62 +35,6 @@ class LoginPageState extends State<LoginPage> {
   final FocusNode _nodeText1 = FocusNode();
   final FocusNode _nodeText2 = FocusNode();
   bool _clickable = false;
-  String _randomCode = '';
-
-  showLoadingDialog(BuildContext loadingContext) {
-    showDialog(
-      context: loadingContext,
-      barrierDismissible: true, //点击遮罩不关闭对话框
-      builder: (loadingContext) {
-        return UnconstrainedBox(
-          constrainedAxis: Axis.vertical,
-          child: SizedBox(
-            width: 180,
-            child: AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                    valueColor: new AlwaysStoppedAnimation<Color>(Colours.app_main),
-                  ),
-//                  Padding(
-//                    padding: const EdgeInsets.only(top: 26.0),
-//                    child: Text("正在加载，请稍后..."),
-//                  )
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  _showSingleAnimationDialog(BuildContext context, Indicator indicator) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (ctx) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(indicator.toString().split('.').last),
-              backgroundColor: Colors.pink,
-            ),
-            backgroundColor: Colors.teal,
-            body: Padding(
-              padding: const EdgeInsets.all(64),
-              child: LoadingIndicator(
-                indicatorType: indicator,
-                color: Colors.white,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 
   @override
   void initState() {
@@ -100,25 +42,10 @@ class LoginPageState extends State<LoginPage> {
     //监听输入改变
     _cardNumberCTR.addListener(_verify);
     _authCodeCTR.addListener(_verify);
-//    _cardNumberCTR.text = Global.instance.cardNumber;
 
-    //获取随机字符串
-    _randomCode = Utils.getRandomCode(4);
-    //存入Global
-    Global.instance.randomCode = _randomCode;
+    //获取随机字符串并存入Global
+    Global.instance.randomCode = Utils.getRandomCode(4);
   }
-
-//  void _getRandomCode() async {
-//    await FlutterStars.SpUtil.getInstance();
-//    _randomCode = FlutterStars.SpUtil.getString(Constant.randomCode);
-//    print('getString:' + _randomCode);
-//  }
-
-//  void _putRandomCode() async {
-//    await FlutterStars.SpUtil.getInstance();
-//    FlutterStars.SpUtil.putString(Constant.randomCode, _randomCode);
-//    print('putString:' + _randomCode);
-//  }
 
   void _verify() {
     String cardNumber = _cardNumberCTR.text;
@@ -128,8 +55,6 @@ class LoginPageState extends State<LoginPage> {
     if (cardNumber.isEmpty || cardNumber.length < 15) {
       clickable = false;
     }
-
-    _randomCode = Global.instance.randomCode;
 
     if (authCode.isEmpty || authCode.length != 4) {
       clickable = false;
@@ -146,21 +71,19 @@ class LoginPageState extends State<LoginPage> {
   void _login() {
     FocusScope.of(context).unfocus();
 
-    if (_authCodeCTR.text.toUpperCase() != _randomCode) {
+    if (_authCodeCTR.text.toUpperCase() != Global.instance.randomCode) {
       Toast.show('验证码输入错误');
       return;
     }
 
-//    Loading.showLoading(context);
-    showLoadingDialog(context);
-//    _showSingleAnimationDialog(context, Indicator.lineScale);
+    EasyLoading.show();
     var params = {'cardno':_cardNumberCTR.text};
     DioUtils.loadData(
       getExamSubject,
       params: params,
       onSuccess: (data) {
         print('onSuccess');
-        Map<String, dynamic> examData = jsonDecode(data);
+        Map examData = jsonDecode(data);
         String cardno = examData['result']['personinfo']['cardno'];
         String personname = examData['result']['personinfo']['personname'];
         List exam = examData['result']['exam'];
@@ -168,12 +91,12 @@ class LoginPageState extends State<LoginPage> {
         Global.instance.personName = personname;
         Global.instance.exam = exam;
 
-
-        Navigator.of(context).pop("SimpleDialogOption One");
-//        Application.router.navigateTo(context, "choose_subject");
+        EasyLoading.dismiss();
+        NavigatorUtils.push(context, Routes.chooseSubject);
       },
       onError: (error) {
         print('onError');
+        EasyLoading.dismiss();
         Toast.show('登录失败');
       },
     );
@@ -187,8 +110,6 @@ class LoginPageState extends State<LoginPage> {
         isBack: false,
         actionName: '验证码登录',
         onPressed: () {
-//          showLoadingDialog();
-//          _showSingleAnimationDialog(context, Indicator.lineScale);
 
         },
       ),
@@ -222,7 +143,7 @@ class LoginPageState extends State<LoginPage> {
       maxLength: 4,
       hintText: '请输入验证码',
       prefixIconPath: 'assets/images/auth_code.png',
-      randomCode: _randomCode,
+      randomCode: Global.instance.randomCode,
     ),
     Gaps.vGap24,
     MyButton(
