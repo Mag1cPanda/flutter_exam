@@ -69,14 +69,13 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void _login() {
-    FocusScope.of(context).unfocus();
+//    FocusScope.of(context).unfocus();
 
     if (_authCodeCTR.text.toUpperCase() != Global.instance.randomCode) {
       Toast.show('验证码输入错误');
       return;
     }
 
-    EasyLoading.show();
     var params = {'cardno':_cardNumberCTR.text};
     DioUtils.loadData(
       getExamSubject,
@@ -91,12 +90,10 @@ class LoginPageState extends State<LoginPage> {
         Global.instance.personName = personname;
         Global.instance.exam = exam;
 
-        EasyLoading.dismiss();
         NavigatorUtils.push(context, Routes.chooseSubject);
       },
       onError: (error) {
         print('onError');
-        EasyLoading.dismiss();
         Toast.show('登录失败');
       },
     );

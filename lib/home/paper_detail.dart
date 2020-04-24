@@ -20,12 +20,19 @@ class _PaperDetailPageState extends State<PaperDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    String datid = Global.instance.selectedPaper['id'];
+    String datname = Global.instance.selectedPaper['datname'];
+    String examid = Global.instance.selectedExam['examid'];
 
-    String datid = '';
-    String datname = '';
-    String examid = '';
-    String path = 'LEAP/EXAMOLH5/html/examviewpaper.html?id=';
-    _paperUrl = baseUrl + path + datid + "&datname=" + datname + "&examid=" + examid;
+    String path = '/LEAP/EXAMOLH5/html/examviewpaper.html?id=';
+
+    String fullUrl = baseUrl + bxContext + path + datid + "&datname=" + datname + "&examid=" + examid;
+    setState(() {
+      _paperUrl = Uri.encodeFull(fullUrl);
+    });
+
+//    print(_paperUrl);
+
   }
 
   @override
@@ -35,7 +42,8 @@ class _PaperDetailPageState extends State<PaperDetailPage> {
         centerTitle: '试卷详情',
         actionName: '验证码登录',
         onPressed: () {
-
+          print(Global.instance.selectedPaper);
+//          print(_paperUrl);
         },
       ),
       body:WebView(
@@ -52,7 +60,7 @@ class _PaperDetailPageState extends State<PaperDetailPage> {
           print(url);
         },
 //          initialUrl:Uri.encodeFull('https://www.baidu.com'),
-        initialUrl:'https://www.baidu.com',
+        initialUrl:_paperUrl,
         javascriptMode: JavascriptMode.unrestricted,
 
       ),

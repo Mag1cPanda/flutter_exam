@@ -4,11 +4,14 @@ class Global {
   String personName = '';
   List exam = [];
 
-  //选择的考试
-  String examId = '';
-  String examSubject = '';
-  String examName = '';
-  String examPic = '';
+
+  String selectedType = '';//选择的考试类型
+  Map selectedExam = {};//选择的考试科目
+//  String examId = '';
+//  String examSubject = '';
+//  String examName = '';
+//  String examPic = '';
+  Map selectedPaper = {};//选择的试卷
 
   factory Global() => _getInstance();
   static Global get instance => _getInstance();

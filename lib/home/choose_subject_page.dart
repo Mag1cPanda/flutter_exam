@@ -28,23 +28,17 @@ class ChooseSubjectPage extends StatefulWidget {
 }
 
 class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
-//  List _exams = [
-//    {'javaClass': 'com.longrise.LEAP.Base.Objects.EntityBean',
-//      'examtype': '100',
-//      'examtypename': '永兴元企业员工测评',
-//      'list':[{'examsubject': '999',
-//        'examtypename': 'sp测试科目',
-//        'examid': '49348573d1d340bb98dafa0702c5ecb9',
-//        'exampic': 'http://wuhan.yxybb.com/BXEXAMOL/LEAP/Download/default/2020/4/9//0f7ef1d5caac45229b374ce265bdb9c7.jpg',
-//        'selected': false}],
-//    },
-//  ];
   List _exams = Global.instance.exam;
   bool _clickable = false;
 
-//  String selectedIcon = 'assets/images/ic_back_black.png';
-//  String unselectedIcon = 'assets/images/ic_back_black.png';
   Map _selectedExam = {};
+
+  String _isexamcode = '';//是否需要考试码
+  String _randomcode = '';//考试码
+  String _dats = '';
+  String _choosestate = '';
+  String _viewsatte = '';
+  String _examstate = '';
 
   @override
   void initState() {
@@ -74,9 +68,7 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
 //        isBack: false,
         actionName: '验证码登录',
         onPressed: () {
-//          print(Global.instance.exam[0]['list'][0]['selected']);
-//          print(_exams);
-          print(Global.instance.exam);
+
         },
       ),
       body:Column(
@@ -136,6 +128,7 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
 
     for(int i=0; i<_exams.length; i++) {
       var exam = _exams[i];
+      var examType = exam['examtype'];
       var typeName = exam['examtypename'];
       var subjects = exam['list'];
       widgets.add(_item(typeName, subjects));
@@ -169,6 +162,7 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
               ),
             ),
             Gaps.hGap10,
+
             Text(typeName,
               style: TextStyle(
                 color: Color(0xFF333333),
@@ -186,29 +180,51 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
   }
 
   void _clickConfirm() {
-    print(_selectedExam);
+    Global.instance.selectedExam = _selectedExam;
 
+    String examId = _selectedExam['examid'];
+    String examSubject = _selectedExam['examsubject'];
+    String examType = '';
 
-//    EasyLoading.show();
-//    var params = {'cardno':Global.instance.cardNumber};
-//    DioUtils.loadData(
-//      getExamProcess,
-//      params: params,
-//      onSuccess: (data) {
-//        print('onSuccess');
-////        Map examData = jsonDecode(data);
-//        EasyLoading.dismiss();
-//
-//        Application.router.navigateTo(context, Routes.selectPaper);
-//      },
-//      onError: (error) {
-//        print('onError');
-//        EasyLoading.dismiss();
-//        Toast.show('登录失败');
-//      },
-//    );
+    //获取上层examType
+    for(int i=0; i<_exams.length; i++) {
+      var exam = _exams[i];
+      var subjects = exam['list'];
+      for(int j=0; j<subjects.length; j++) {
+        var obj = subjects[j];
+        if(obj['examid'] == examId) {
+          examType = Global.instance.selectedType = exam['examtype'];
+        }
+      }
+    }
 
+    var params = {
+      'examtype':examType,
+      'examsubject':examSubject,
+      'examid':examId,
+    };
+    var bean = {'bean':params};
+    DioUtils.loadData(
+      getExamProcess,
+      params: bean,
+      onSuccess: (data) {
+        Map tmp = jsonDecode(data);
+        Map result = tmp['result'];
+        Map listData = result['list'];
 
+        _isexamcode = listData['isexamcode'];
+        _randomcode = listData['randomcode'];
+        _dats = listData['dats'].toString();
+        _choosestate = listData['choosestate'];
+        _viewsatte = listData['viewsatte'];
+        _examstate = listData['examstate'];
+
+        Application.router.navigateTo(context, Routes.selectPaper);
+      },
+      onError: (error) {
+        Toast.show('请求失败');
+      },
+    );
   }
 
   Widget _buildSub(Map subject) {
@@ -235,7 +251,6 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
         ),
         groupValue: _selectedExam,
         onChanged: (value) {
-          print(value);
           setState(() {
             _selectedExam = subject;
             _clickable = true;

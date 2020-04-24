@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'dart:async';
-import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
+import 'package:dio/dio.dart';
 import 'package:flutterexam/config/config.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class DioUtils {
   static Dio _dio;
@@ -36,14 +33,14 @@ class DioUtils {
         Function(T t) onSuccess,
         Function(String error) onError,
       }) async {
-//    var url = bxContext + methodName + suffix;
     var url = bxContext + restAPI + methodName + suffix;
-    print(url);
+    EasyLoading.show();
     var result;
     try {
       Response response = await DioUtils.buildDio().post(url,
           data: params);
       result = response.data;
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         if (onSuccess != null) {
           onSuccess(result);
@@ -55,6 +52,7 @@ class DioUtils {
     } catch (e) {
       print('请求出错：' + e.toString());
       onError(e.toString());
+      EasyLoading.dismiss();
     }
   }
 }
