@@ -3,6 +3,13 @@ import 'package:flutterexam/res/gaps.dart';
 import 'package:flutterexam/widgets/app_bar.dart';
 import 'package:flutterexam/common/global.dart';
 import 'package:flutterexam/res/colors.dart';
+import 'package:flutterexam/widgets/my_button.dart';
+import 'package:flutterexam/routers/fluro_navigator.dart';
+import 'package:flutterexam/routers/routes.dart';
+import 'package:flutterexam/net/dio_utils.dart';
+import 'package:flutterexam/util/toast.dart';
+import 'package:flutterexam/config/config.dart';
+import 'dart:convert';
 
 class ExamNoticePage extends StatefulWidget {
   @override
@@ -19,108 +26,148 @@ class _ExamNoticePageState extends State<ExamNoticePage> {
     super.initState();
   }
 
+  void _clickConfirm() {
+    String examid = Global.instance.selectedExam['examid'];
+    var params = {
+      'comfrom':'2',
+      'examid':examid};
+    print(params);
+    DioUtils.loadData(
+      createPaper,
+      params: params,
+      onSuccess: (data) {
+        print('onSuccess');
+        print(data);
+        Map tmpData = jsonDecode(data);
+        if(tmpData['resultstate'] == 1) {
+          NavigatorUtils.push(context, Routes.examQuestions);
+        } else {
+          Toast.show(data['resultdesc']);
+        }
+      },
+      onError: (error) {
+        print('onError');
+        Toast.show('请求出错');
+      },
+    );
+  }
+
+  get _buildList => [
+    Padding(
+      padding: EdgeInsets.all(20),
+      child: Text(
+        headStr,
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.all(20),
+      child: Text(
+        '以下情况均属于考试违纪行为',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        '1、利用各种照片代替本人通过人脸识别',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        '2、考试过程中使用手机、平板等电子产品',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        '3、考试过程中与他人交头接耳',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        '4、考试过程中轮换其他人代替考试',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        '5、考试中途离开视频监控画面',
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+
+    Padding(
+      padding: EdgeInsets.all(20),
+      child: Text(
+        bottemStr,
+        style: TextStyle(
+          color: Color(0xFF333333),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
         centerTitle: '考试须知',
       ),
-      body:ListView(
+      body:Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              headStr,
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
+          Expanded(
+            child: ListView(
+              children: _buildList,
             ),
           ),
 
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              '以下情况均属于考试违纪行为',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 18,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              '1、利用各种照片代替本人通过人脸识别',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              '2、考试过程中使用手机、平板等电子产品',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              '3、考试过程中与他人交头接耳',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              '4、考试过程中轮换其他人代替考试',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              '5、考试中途离开视频监控画面',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              bottemStr,
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
+          MyButton(
+            key: const Key('login'),
+            onPressed: _clickConfirm,
+            text: '开始考试',
           ),
         ],
       ),

@@ -59,7 +59,6 @@ class _PaperDetailPageState extends State<PaperDetailPage> {
         onPageFinished: (String url) {
           print(url);
         },
-//          initialUrl:Uri.encodeFull('https://www.baidu.com'),
         initialUrl:_paperUrl,
         javascriptMode: JavascriptMode.unrestricted,
 
