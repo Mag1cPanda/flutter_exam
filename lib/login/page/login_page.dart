@@ -83,18 +83,22 @@ class LoginPageState extends State<LoginPage> {
       onSuccess: (data) {
         print('onSuccess');
         Map examData = jsonDecode(data);
-        String cardno = examData['result']['personinfo']['cardno'];
-        String personname = examData['result']['personinfo']['personname'];
-        List exam = examData['result']['exam'];
-        Global.instance.cardNumber = cardno;
-        Global.instance.personName = personname;
-        Global.instance.exam = exam;
+        print(examData);
+        if(examData['resultstate'] == 0) {
+          Toast.show(examData['resultdesc']);
+        } else {
+          String cardno = examData['result']['personinfo']['cardno'];
+          String personname = examData['result']['personinfo']['personname'];
+          List exam = examData['result']['exam'];
+          Global.instance.cardNumber = cardno;
+          Global.instance.personName = personname;
+          Global.instance.exam = exam;
 
-        NavigatorUtils.push(context, Routes.chooseSubject);
+          NavigatorUtils.push(context, Routes.chooseSubject);
+        }
       },
       onError: (error) {
-        print('onError');
-        Toast.show('登录失败');
+        print('请求失败' + getExamSubject);
       },
     );
   }

@@ -217,7 +217,7 @@ class _ChooseSubjectPageState extends State<ChooseSubjectPage> {
         _viewsatte = listData['viewsatte'];
         _examstate = listData['examstate'];
 
-        Application.router.navigateTo(context, Routes.selectPaper);
+        NavigatorUtils.push(context, Routes.examProcess);
       },
       onError: (error) {
         Toast.show('请求失败');

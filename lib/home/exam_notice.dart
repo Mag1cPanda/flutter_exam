@@ -26,7 +26,7 @@ class _ExamNoticePageState extends State<ExamNoticePage> {
     super.initState();
   }
 
-  void _clickConfirm() {
+  void postCreatePaper() {
     String examid = Global.instance.selectedExam['examid'];
     var params = {
       'comfrom':'2',
@@ -36,12 +36,40 @@ class _ExamNoticePageState extends State<ExamNoticePage> {
       createPaper,
       params: params,
       onSuccess: (data) {
-        print('onSuccess');
-        print(data);
         Map tmpData = jsonDecode(data);
         if(tmpData['resultstate'] == 1) {
           NavigatorUtils.push(context, Routes.examQuestions);
         } else {
+          Toast.show(tmpData['resultdesc']);
+        }
+      },
+      onError: (error) {
+        print('onError');
+      },
+    );
+  }
+
+  void _clickConfirm() {
+    String examId = Global.instance.selectedExam['examid'];
+    String examSubject = Global.instance.selectedExam['examsubject'];
+    String examType = Global.instance.selectedType;
+    var params = {
+      'examtype':examType,
+      'examsubject':examSubject,
+      'examid':examId,
+    };
+    var bean = {'bean':params};
+    print(bean);
+    DioUtils.loadData(
+      getExamConfigByExamType,
+      params: bean,
+      onSuccess: (data) {
+        Map tmpData = jsonDecode(data);
+        print(tmpData['result']['isallowexam']);
+        if(tmpData['result']['isallowexam']) {
+          postCreatePaper();
+        }
+        else {
           Toast.show(data['resultdesc']);
         }
       },
