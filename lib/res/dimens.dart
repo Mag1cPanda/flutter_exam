@@ -7,6 +7,7 @@ class Dimens {
   static const double font_sp18 = 18.0;
   static const double font_sp20 = 20.0;
 
+  static const double gap_dp1 = 1;
   static const double gap_dp4 = 4;
   static const double gap_dp5 = 5;
   static const double gap_dp8 = 8;

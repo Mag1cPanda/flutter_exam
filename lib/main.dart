@@ -33,20 +33,22 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FlutterEasyLoading(
-      child: OKToast(
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+    return MaterialApp(
+      home: FlutterEasyLoading(
+        child: OKToast(
+          child: MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: AppComponent(),
           ),
-          home: AppComponent(),
-        ),
 
-        backgroundColor: Colors.black54,
-        textPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-        radius: 20.0,
-        position: ToastPosition.bottom,
+          backgroundColor: Colors.black54,
+          textPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          radius: 20.0,
+          position: ToastPosition.bottom,
+        ),
       ),
     );
   }

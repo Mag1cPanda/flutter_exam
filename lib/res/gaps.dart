@@ -6,6 +6,7 @@ import 'package:flutterexam/res/resources.dart';
 class Gaps {
 
   /// 水平间隔
+  static const Widget hGap1 = const SizedBox(width: Dimens.gap_dp1);
   static const Widget hGap4 = const SizedBox(width: Dimens.gap_dp4);
   static const Widget hGap5 = const SizedBox(width: Dimens.gap_dp5);
   static const Widget hGap8 = const SizedBox(width: Dimens.gap_dp8);

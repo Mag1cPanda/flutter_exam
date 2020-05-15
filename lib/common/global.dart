@@ -4,6 +4,8 @@ class Global {
   String personName = '';
   List exam = [];
 
+  List allQuestions = [];
+
 
   String selectedType = '';//选择的考试类型
   Map selectedExam = {};//选择的考试科目

@@ -9,6 +9,7 @@ import 'package:flutterexam/home/paper_detail.dart';
 import 'package:flutterexam/home/exam_process.dart';
 import 'package:flutterexam/home/exam_notice.dart';
 import 'package:flutterexam/home/exam_questions.dart';
+import 'package:flutterexam/home/answer_card.dart';
 
 var loginHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -43,4 +44,9 @@ var examNoticeHandle = Handler(
 var examQuestionsHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return ExamQuestionsPage();
+    });
+
+var answerCardHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return AnswerCardPage();
     });

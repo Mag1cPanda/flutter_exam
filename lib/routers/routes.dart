@@ -11,6 +11,7 @@ class Routes {
   static String examProcess = "/exam_process";
   static String examNotice = "/exam_notice";
   static String examQuestions = "/exam_questions";
+  static String answerCard = "/answer_card";
   static String webViewPage = '/webview';
 
   static void configureRoutes(Router router) {
@@ -22,6 +23,7 @@ class Routes {
     router.define(examProcess, handler: examProcessHandle, transitionType: TransitionType.inFromRight);
     router.define(examNotice, handler: examNoticeHandle, transitionType: TransitionType.inFromRight);
     router.define(examQuestions, handler: examQuestionsHandle, transitionType: TransitionType.inFromRight);
+    router.define(answerCard, handler: answerCardHandle, transitionType: TransitionType.inFromRight);
 
     router.define(webViewPage, handler: Handler(handlerFunc: (_, params) {
       String title = params['title']?.first;

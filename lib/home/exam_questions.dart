@@ -153,9 +153,17 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
           for(int i=0; i<_allQuestions.length; i++) {
             Map tmp = _allQuestions[i];
             tmp['ismark'] = false;
+            tmp['answer'] = '';
+            List _lstsubinfo = tmp['_lstsubinfo'];
+            for(int j=0; j<_lstsubinfo.length; j++) {
+              Map info = _lstsubinfo[j];
+              info['selected'] = false;
+              tmp['answer'] += '0';
+            }
           }
 //          print('_allQuestions' + '${_allQuestions.length}');
           print(_allQuestions);
+          Global.instance.allQuestions = _allQuestions;
 
           setState(() {
 
@@ -251,7 +259,7 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
               Gaps.vGap16,
 
               Column(
-                children: _buildOptions(data['_lstsubinfo']),
+                children: _buildOptions(data['_lstsubinfo'], data['_typeid']),
               ),
             ],
           ),
@@ -261,7 +269,7 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
   }
 
 
-  List<Widget> _buildOptions(List data) {
+  List<Widget> _buildOptions(List data, String qType) {
     List<Widget> options = [];
     for(int i=0; i<data.length; i++) {
       Map item = data[i];
@@ -269,10 +277,41 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
         GestureDetector(
           onTap: () {
             print(i);
+            item['selected'] = !item['selected'];
+            String answer = _allQuestions[i]['answer'];
+            List arr = answer.split('');
+            if(item['selected'] == true) {
+              arr[i] = '1';
+            } else {
+              arr[i] = '0';
+            }
+
+
+            if(qType == '2') {
+
+            }
+            //单选和判断
+            else if(qType == '1' || qType == '3') {
+              //遍历设置其他选项为false
+              for(int j=0; j<data.length; j++) {
+                if(j != i) {
+                  data[j]['selected'] = false;
+                }
+              }
+            }
+
+            String newAnswer = arr.join('');
+            _allQuestions[i]['answer'] = newAnswer;
+
+            print('newAnswer:' + newAnswer);
+
+            setState(() {
+
+            });
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Color(0x21FFA200),
+              color: item['selected'] == true ? Color(0x21FFA200) : Color(0x21FFFFFF),
               borderRadius: BorderRadius.circular(5),
               border: Border.all(
                 color: Color(0x21666666),
@@ -288,7 +327,7 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
 //                    color: Colors.red,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Color(0xFFFFA200),
+                    color: item['selected'] == true ? Color(0xFFFFA200) : Color(0xFF777777),
                   ),
                   alignment: Alignment.center,
                   child: Text(
@@ -330,7 +369,19 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
         actionName: '验证码登录',
         onPressed: () {
           print(_allQuestions);
-//          loadExamRecord();
+
+//          showModalBottomSheet(
+//              context: context,
+//              builder: (BuildContext context){
+//                return Container(
+//                  width: 750,
+//                  height: 750,
+//                  color: Colours.red,
+//                  child: FlatButton(onPressed: (){
+//                  }, child: Text('11111')),
+//                );
+//              }
+//          );
         },
       ),
       body:Column(
@@ -386,14 +437,38 @@ class _ExamQuestionsPageState extends State<ExamQuestionsPage> {
             ),
           ),
 
-          MyButton(
-            key: const Key('login'),
-            onPressed: null,
-            text: '确认',
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: MyButton(
+                  key: const Key('answerCard'),
+                  onPressed: clickAnswerCard,
+                  text: '答题卡',
+                ),
+                flex: 1,
+              ),
+              Gaps.hGap1,
+              Expanded(
+                child: MyButton(
+                  key: const Key('commitPaper'),
+                  onPressed: clickCommit,
+                  text: '交卷',
+                ),
+                flex: 1,
+              ),
+            ],
           ),
-
         ],
       ),
     );
+  }
+
+  clickAnswerCard(){
+    print('clickAnswerCard');
+    NavigatorUtils.push(context, Routes.answerCard);
+  }
+
+  clickCommit(){
+    print('clickCommit');
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutterexam/config/config.dart';
+import 'package:flutterexam/net/dio_utils.dart';
 import 'package:flutterexam/res/gaps.dart';
 import 'package:flutterexam/routers/fluro_navigator.dart';
 import 'package:flutterexam/routers/routes.dart';
@@ -6,6 +8,8 @@ import 'package:flutterexam/widgets/app_bar.dart';
 import 'package:flutterexam/common/global.dart';
 import 'package:flutterexam/res/colors.dart';
 import 'package:flutterexam/widgets/my_button.dart';
+import 'dart:convert';
+import 'package:flutterexam/util/toast.dart';
 
 class ExamProcessPage extends StatefulWidget {
   @override
@@ -18,10 +22,52 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
   String step2Img = 'assets/images/process_step2.png';
   String step3Img = 'assets/images/process_step3.png';
 
+  String examsubjectname = '';
+  String unifytime = '';
+  String endtime = '';
+  String examtime = '';
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+
+    String examId = Global.instance.selectedExam['examid'];
+    String examSubject = Global.instance.selectedExam['examsubject'];
+    String examType = Global.instance.selectedType;
+
+    var params = {
+      'examtype':examType,
+      'examsubject':examSubject,
+      'examid':examId,
+    };
+    var bean = {'bean':params};
+    print(bean);
+
+    DioUtils.silentLoadData(
+      getExamProcess,
+      params: bean,
+      onSuccess: (data) {
+        Map tmpData = jsonDecode(data);
+        if(tmpData['resultstate'] == 1) {
+          Map result = tmpData['result'];
+          Map list = result['list'];
+          this.examsubjectname = list['examsubjectname'];
+          this.unifytime = list['unifytime'];
+          this.endtime = list['endtime'];
+          this.examtime = list['examtime'];
+          setState(() {
+
+          });
+        } else {
+          Toast.show(data['resultdesc']);
+        }
+      },
+      onError: (error) {
+        print('请求出错' + getExamRecord);
+      },
+    );
   }
 
   void _clickConfirm() {
@@ -70,7 +116,7 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  '投额与变额年金险资质模拟',
+                  this.examsubjectname,
                   style: TextStyle(
                       fontSize: 16,
                       color: Colors.white
@@ -80,7 +126,7 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
                 Gaps.vGap10,
 
                 Text(
-                  '开始时间：2019-01-10  09：00',
+                  '开始时间：'+this.unifytime,
                   style: TextStyle(
                       fontSize: 14,
                       color: Colors.white
@@ -90,7 +136,7 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
                 Gaps.vGap5,
 
                 Text(
-                  '结束时间：2019-01-10  09：00',
+                  '结束时间：'+this.endtime,
                   style: TextStyle(
                       fontSize: 14,
                       color: Colors.white
@@ -100,7 +146,7 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
                 Gaps.vGap5,
 
                 Text(
-                  '考试时长：120分钟',
+                  '考试时长：'+this.examtime+'分钟',
                   style: TextStyle(
                       fontSize: 14,
                       color: Colors.white
@@ -160,7 +206,7 @@ class _ExamProcessPageState extends State<ExamProcessPage> {
           children: <Widget>[
             Gaps.hGap70,
             Text(
-              '请点击页面下方【确认】按钮也，进入第二步；',
+              '请确认考试开始时间，考试结束后，不能进入考试；',
               style: TextStyle(
                 color: Color(0xff333333),
                 fontSize: 14,
